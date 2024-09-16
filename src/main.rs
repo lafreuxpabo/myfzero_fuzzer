@@ -217,14 +217,21 @@ impl GrammarRust {
         program += &format!(r#"
 #![allow(unused)]
 use std::cell::Cell;
+use std::fs::File;
+use std::os::fd::{{BorrowedFd, RawFd}};
 use std::time::Instant;
 
-fn main() {{
+fn main(){{
+    return
+}}
+
+
+pub(crate) fn start_fuzzer(myfd: &File) {{
     let mut fuzzer = Fuzzer {{
         seed:  Cell::new(0x34cc028e11b4f89c),
         buf:   Vec::new(),
     }};
-    
+
     let mut generated = 0usize;
     let it = Instant::now();
 
@@ -232,15 +239,24 @@ fn main() {{
         fuzzer.buf.clear();
         fuzzer.fragment_{}(0);
         generated += fuzzer.buf.len();
-
+        let s = match std::str::from_utf8(&fuzzer.buf) {{
+            Ok(s) => s,
+            Err(_) => {{
+                panic!("Could not decode UTF-8 string");
+            }},
+            //Change here handling code of generated output
+        }};
+        //let _ = save_outputs::save_input(s, myfd);
         // Filter to reduce the amount of times printing occurs
         if (iters & 0xfffff) == 0 {{
             let elapsed = (Instant::now() - it).as_secs_f64();
             let bytes_per_sec = generated as f64 / elapsed;
             print!("MiB/sec: {{:12.4}}\n", bytes_per_sec / 1024. / 1024.);
+            print!("Last input: {{}}\n", s);
         }}
     }}
 }}
+
 
 struct Fuzzer {{
     seed:  Cell<usize>,
