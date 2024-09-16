@@ -1,5 +1,8 @@
 # Intro
 
+
+Fork of https://github.com/gamozolabs/fzero_fuzzer. Help me to gain time.
+
 `fzero` is a grammar-based fuzzer that generates a Rust application inspired
 by the paper "Building Fast Fuzzers" by Rahul Gopinath and Andreas Zeller.
 https://arxiv.org/pdf/1911.07707.pdf
